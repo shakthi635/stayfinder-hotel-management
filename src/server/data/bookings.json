@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1,
+    "hotelId": 1,
+    "hotelName": "Ocean Pearl Resort",
+    "guestName": "Shakthi G",
+    "email": "gshakthi5@gmail.com",
+    "phone": "7899247785",
+    "checkIn": "2026-07-28",
+    "checkOut": "2026-07-30",
+    "guests": 2,
+    "status": "Confirmed",
+    "createdAt": "2026-08-28T09:42:22.166Z"
+  }
+]

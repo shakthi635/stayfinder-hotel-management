@@ -1,0 +1,317 @@
+.hotel-amenities {
+  width: 100%;
+  background: #ffffff;
+  padding: 70px 20px 90px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #263746;
+}
+
+.amenities-container {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+
+
+.amenities-heading {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.amenities-heading h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 42px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  color: #263746;
+}
+
+.heading-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #263746;
+  opacity: 0.55;
+}
+
+.dot.active {
+  width: 9px;
+  height: 9px;
+  opacity: 1;
+}
+
+
+
+.amenities-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 35px;
+  margin-top: 28px;
+}
+
+.amenity-tab {
+  position: relative;
+  border: none;
+  background: transparent;
+  padding: 16px 5px 17px;
+
+  font-size: 16px;
+  font-weight: 500;
+  color: #52606d;
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.amenity-tab:hover {
+  color: #1f536f;
+}
+
+.amenity-tab.active {
+  color: #263746;
+}
+
+.amenity-tab.active::after {
+  content: "";
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 3px;
+  background: #3b91bb;
+}
+
+.tab-count {
+  margin-left: 4px;
+}
+
+
+
+.amenities-divider {
+  width: 100%;
+  height: 1px;
+  background: #dedede;
+}
+
+
+
+.amenities-subheader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin: 35px 0 35px;
+}
+
+.amenities-subheader h3 {
+  margin: 0;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+  font-weight: 400;
+
+  color: #263746;
+}
+
+.included-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  font-size: 14px;
+  color: #52606d;
+  font-style: italic;
+}
+
+.included-symbol {
+  width: 17px;
+  height: 17px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 1.5px solid #6b747b;
+  border-radius: 50%;
+}
+
+
+.amenities-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  column-gap: 55px;
+  row-gap: 30px;
+}
+
+
+
+.amenity-item {
+  display: flex;
+  align-items: flex-start;
+
+  min-height: 48px;
+
+  cursor: default;
+}
+
+.amenity-icon {
+  width: 34px;
+  min-width: 34px;
+
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  color: #3b91bb;
+}
+
+.amenity-content {
+  padding-left: 8px;
+}
+
+.amenity-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.amenity-name {
+  font-size: 15px;
+  line-height: 1.4;
+  color: #36454f;
+}
+
+.included-check {
+  width: 15px;
+  height: 15px;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 1px solid #6b747b;
+  border-radius: 50%;
+
+  color: #52606d;
+}
+
+.amenity-description {
+  display: block;
+
+  margin-top: 4px;
+
+  font-size: 13px;
+  line-height: 1.4;
+
+  color: #8a9399;
+}
+
+
+
+.amenity-item {
+  transition: transform 0.2s ease;
+}
+
+.amenity-item:hover {
+  transform: translateY(-2px);
+}
+
+.amenity-item:hover .amenity-name {
+  color: #1f536f;
+}
+
+.amenity-item:hover .amenity-icon {
+  color: #267ba4;
+}
+
+
+
+@media (max-width: 900px) {
+  .hotel-amenities {
+    padding: 55px 25px 70px;
+  }
+
+  .amenities-heading h2 {
+    font-size: 34px;
+  }
+
+  .amenities-tabs {
+    gap: 15px;
+  }
+
+  .amenity-tab {
+    font-size: 14px;
+  }
+
+  .amenities-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    column-gap: 35px;
+  }
+}
+
+
+
+@media (max-width: 600px) {
+  .hotel-amenities {
+    padding: 40px 18px 55px;
+  }
+
+  .amenities-heading h2 {
+    font-size: 27px;
+    line-height: 1.25;
+  }
+
+  .amenities-tabs {
+    justify-content: flex-start;
+
+    overflow-x: auto;
+
+    gap: 5px;
+
+    padding-bottom: 0;
+  }
+
+  .amenity-tab {
+    white-space: nowrap;
+    font-size: 13px;
+
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .amenities-subheader {
+    display: block;
+    margin-top: 28px;
+  }
+
+  .amenities-subheader h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+
+  .included-label {
+    font-size: 13px;
+  }
+
+  .amenities-grid {
+    grid-template-columns: 1fr;
+    row-gap: 24px;
+  }
+}

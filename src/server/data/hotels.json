@@ -1,0 +1,109 @@
+[
+  {
+    "id": 1,
+    "name": "Ocean Pearl Resort",
+    "location": "Goa, India",
+    "price": 4500,
+    "rating": 4.8,
+    "description": "A beautiful beachfront resort with comfortable rooms, a swimming pool and excellent dining.",
+    "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
+    "amenities": [
+      "Free WiFi",
+      "Swimming Pool",
+      "Beach Access",
+      "Restaurant",
+      "Parking"
+    ],
+    "rooms": [
+      {
+        "id": 1,
+        "name": "Deluxe Sea View",
+        "price": 4500,
+        "capacity": 2
+      },
+      {
+        "id": 2,
+        "name": "Family Suite",
+        "price": 6500,
+        "capacity": 4
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Mountain View Hotel",
+    "location": "Ooty, India",
+    "price": 3200,
+    "rating": 4.6,
+    "description": "Enjoy peaceful mountain views and a relaxing stay surrounded by beautiful nature.",
+    "image": "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&q=80",
+    "amenities": [
+      "Free WiFi",
+      "Restaurant",
+      "Room Service",
+      "Parking",
+      "Garden"
+    ],
+    "rooms": [
+      {
+        "id": 1,
+        "name": "Mountain Deluxe",
+        "price": 3200,
+        "capacity": 2
+      },
+      {
+        "id": 2,
+        "name": "Family Room",
+        "price": 4800,
+        "capacity": 4
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Royal City Hotel",
+    "location": "Bangalore, India",
+    "price": 5500,
+    "rating": 4.9,
+    "description": "A modern luxury hotel located in the heart of the city with premium facilities.",
+    "image": "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=80",
+    "amenities": [
+      "Free WiFi",
+      "Gym",
+      "Swimming Pool",
+      "Restaurant",
+      "Spa"
+    ],
+    "rooms": [
+      {
+        "id": 1,
+        "name": "Luxury King Room",
+        "price": 5500,
+        "capacity": 2
+      },
+      {
+        "id": 2,
+        "name": "Executive Suite",
+        "price": 8000,
+        "capacity": 3
+      }
+    ]
+  },
+  {
+    "id": "1788277870424",
+    "name": "Ambica empire",
+    "location": "Vadapalani, Chennai.",
+    "city": "",
+    "description": "",
+    "price": 4483,
+    "rating": 4.5,
+    "rooms": 1,
+    "amenities": [
+      "free wifi",
+      "swimming pool",
+      "GYM."
+    ],
+    "image": "/uploads/1788310692048-886330447.jpg",
+    "createdAt": "2026-09-01T15:51:10.424Z"
+  }
+]
