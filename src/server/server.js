@@ -9,7 +9,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 5000;
+
+// Render provides PORT automatically.
+// When running locally, it will use port 5000.
+const PORT = process.env.PORT || 5000;
+
+app.set("trust proxy", 1);
 
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
@@ -36,7 +41,10 @@ const storage = multer.diskStorage({
     const uniqueName =
       Date.now() + "-" + Math.round(Math.random() * 100000);
 
-    cb(null, uniqueName + path.extname(file.originalname));
+    cb(
+      null,
+      uniqueName + path.extname(file.originalname)
+    );
   }
 });
 
@@ -75,7 +83,8 @@ let hotels = [
         id: 1,
         user: "Arun",
         rating: 5,
-        comment: "Amazing location and very clean rooms."
+        comment:
+          "Amazing location and very clean rooms."
       },
       {
         id: 2,
@@ -110,7 +119,8 @@ let hotels = [
         id: 1,
         user: "Karthik",
         rating: 5,
-        comment: "Beautiful view and comfortable rooms."
+        comment:
+          "Beautiful view and comfortable rooms."
       }
     ]
   },
@@ -166,12 +176,13 @@ let nextHotelId = 5;
 let nextBookingId = 1;
 
 /* =========================================================
-   HOME
+   HOME / HEALTH CHECK
 ========================================================= */
 
 app.get("/", (req, res) => {
   res.json({
-    message: "StayFinder API is running successfully"
+    message: "StayFinder API is running successfully",
+    status: "online"
   });
 });
 
@@ -190,7 +201,9 @@ app.get("/api/hotels", (req, res) => {
 app.get("/api/hotels/:id", (req, res) => {
   const id = Number(req.params.id);
 
-  const hotel = hotels.find((item) => item.id === id);
+  const hotel = hotels.find(
+    (item) => item.id === id
+  );
 
   if (!hotel) {
     return res.status(404).json({
@@ -223,23 +236,35 @@ app.post(
 
       if (!name || !city || !price) {
         return res.status(400).json({
-          message: "Hotel name, city and price are required"
+          message:
+            "Hotel name, city and price are required"
         });
       }
 
       const hotel = {
         id: nextHotelId++,
+
         name,
+
         location: location || city,
+
         city,
+
         description: description || "",
+
         price: Number(price),
+
         rating: Number(rating) || 4,
+
         rooms: Number(rooms) || 1,
+
         totalRooms: Number(rooms) || 1,
 
+        // Online-compatible image URL
         image: req.file
-          ? `http://localhost:${PORT}/uploads/${req.file.filename}`
+          ? `${req.protocol}://${req.get(
+              "host"
+            )}/uploads/${req.file.filename}`
           : "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
 
         amenities:
@@ -260,7 +285,10 @@ app.post(
         hotel
       });
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Add hotel error:",
+        error
+      );
 
       res.status(500).json({
         message: "Unable to add hotel"
@@ -302,8 +330,12 @@ app.put(
       } = req.body;
 
       hotel.name = name ?? hotel.name;
-      hotel.location = location ?? hotel.location;
+
+      hotel.location =
+        location ?? hotel.location;
+
       hotel.city = city ?? hotel.city;
+
       hotel.description =
         description ?? hotel.description;
 
@@ -316,12 +348,14 @@ app.put(
       }
 
       if (rooms !== undefined) {
-        const newTotalRooms = Number(rooms);
+        const newTotalRooms =
+          Number(rooms);
 
         const bookedRooms =
           hotel.totalRooms - hotel.rooms;
 
-        hotel.totalRooms = newTotalRooms;
+        hotel.totalRooms =
+          newTotalRooms;
 
         hotel.rooms = Math.max(
           0,
@@ -339,20 +373,28 @@ app.put(
             : hotel.amenities;
       }
 
+      // Online-compatible uploaded image URL
       if (req.file) {
         hotel.image =
-          `http://localhost:${PORT}/uploads/${req.file.filename}`;
+          `${req.protocol}://${req.get(
+            "host"
+          )}/uploads/${req.file.filename}`;
       }
 
       res.json({
-        message: "Hotel updated successfully",
+        message:
+          "Hotel updated successfully",
         hotel
       });
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Update hotel error:",
+        error
+      );
 
       res.status(500).json({
-        message: "Unable to update hotel"
+        message:
+          "Unable to update hotel"
       });
     }
   }
@@ -362,100 +404,41 @@ app.put(
    DELETE HOTEL
 ========================================================= */
 
-app.delete("/api/hotels/:id", (req, res) => {
-  const id = Number(req.params.id);
+app.delete(
+  "/api/hotels/:id",
+  (req, res) => {
+    const id = Number(req.params.id);
 
-  const index = hotels.findIndex(
-    (item) => item.id === id
-  );
+    const index = hotels.findIndex(
+      (item) => item.id === id
+    );
 
-  if (index === -1) {
-    return res.status(404).json({
-      message: "Hotel not found"
+    if (index === -1) {
+      return res.status(404).json({
+        message: "Hotel not found"
+      });
+    }
+
+    hotels.splice(index, 1);
+
+    res.json({
+      message:
+        "Hotel deleted successfully"
     });
   }
-
-  hotels.splice(index, 1);
-
-  res.json({
-    message: "Hotel deleted successfully"
-  });
-});
+);
 
 /* =========================================================
    ADD REVIEW / RATING
 ========================================================= */
 
-app.post("/api/hotels/:id/reviews", (req, res) => {
-  const id = Number(req.params.id);
-
-  const hotel = hotels.find(
-    (item) => item.id === id
-  );
-
-  if (!hotel) {
-    return res.status(404).json({
-      message: "Hotel not found"
-    });
-  }
-
-  const {
-    user,
-    rating,
-    comment
-  } = req.body;
-
-  if (!rating || !comment) {
-    return res.status(400).json({
-      message: "Rating and comment are required"
-    });
-  }
-
-  const newReview = {
-    id: Date.now(),
-    user: user || "Guest",
-    rating: Number(rating),
-    comment
-  };
-
-  hotel.reviews.push(newReview);
-
-  const totalRating =
-    hotel.reviews.reduce(
-      (sum, review) =>
-        sum + Number(review.rating),
-      0
-    );
-
-  hotel.rating = Number(
-    (totalRating / hotel.reviews.length).toFixed(1)
-  );
-
-  res.status(201).json({
-    message: "Review added successfully",
-    hotel
-  });
-});
-
-/* =========================================================
-   CREATE BOOKING
-========================================================= */
-
-app.post("/api/bookings", (req, res) => {
-  try {
-    const {
-      hotelId,
-      guestName,
-      email,
-      phone,
-      checkIn,
-      checkOut,
-      guests,
-      rooms
-    } = req.body;
+app.post(
+  "/api/hotels/:id/reviews",
+  (req, res) => {
+    const id = Number(req.params.id);
 
     const hotel = hotels.find(
-      (item) => item.id === Number(hotelId)
+      (item) => item.id === id
     );
 
     if (!hotel) {
@@ -464,156 +447,325 @@ app.post("/api/bookings", (req, res) => {
       });
     }
 
-    const requestedRooms = Number(rooms) || 1;
+    const {
+      user,
+      rating,
+      comment
+    } = req.body;
 
-    if (hotel.rooms < requestedRooms) {
+    if (!rating || !comment) {
       return res.status(400).json({
-        message: `Only ${hotel.rooms} room(s) available`
+        message:
+          "Rating and comment are required"
       });
     }
 
-    if (
-      !guestName ||
-      !email ||
-      !checkIn ||
-      !checkOut
-    ) {
-      return res.status(400).json({
-        message: "Please fill all required booking details"
-      });
-    }
+    const newReview = {
+      id: Date.now(),
 
-    const nights = Math.max(
-      1,
-      Math.ceil(
-        (new Date(checkOut) -
-          new Date(checkIn)) /
-          (1000 * 60 * 60 * 24)
-      )
-    );
+      user: user || "Guest",
 
-    const totalPrice =
-      hotel.price * requestedRooms * nights;
+      rating: Number(rating),
 
-    hotel.rooms -= requestedRooms;
-
-    const booking = {
-      id: nextBookingId++,
-      hotelId: hotel.id,
-      hotelName: hotel.name,
-      hotelImage: hotel.image,
-      guestName,
-      email,
-      phone: phone || "",
-      checkIn,
-      checkOut,
-      guests: Number(guests) || 1,
-      rooms: requestedRooms,
-      nights,
-      pricePerNight: hotel.price,
-      totalPrice,
-      status: "Confirmed",
-      bookedAt: new Date().toISOString()
+      comment
     };
 
-    bookings.push(booking);
+    hotel.reviews.push(newReview);
+
+    const totalRating =
+      hotel.reviews.reduce(
+        (sum, review) =>
+          sum + Number(review.rating),
+        0
+      );
+
+    hotel.rating = Number(
+      (
+        totalRating /
+        hotel.reviews.length
+      ).toFixed(1)
+    );
 
     res.status(201).json({
-      message: "Booking confirmed successfully",
-      booking
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      message: "Booking failed"
+      message:
+        "Review added successfully",
+      hotel
     });
   }
-});
+);
+
+/* =========================================================
+   CREATE BOOKING
+========================================================= */
+
+app.post(
+  "/api/bookings",
+  (req, res) => {
+    try {
+      const {
+        hotelId,
+        guestName,
+        email,
+        phone,
+        checkIn,
+        checkOut,
+        guests,
+        rooms
+      } = req.body;
+
+      const hotel = hotels.find(
+        (item) =>
+          item.id === Number(hotelId)
+      );
+
+      if (!hotel) {
+        return res.status(404).json({
+          message: "Hotel not found"
+        });
+      }
+
+      const requestedRooms =
+        Number(rooms) || 1;
+
+      if (
+        hotel.rooms <
+        requestedRooms
+      ) {
+        return res.status(400).json({
+          message: `Only ${hotel.rooms} room(s) available`
+        });
+      }
+
+      if (
+        !guestName ||
+        !email ||
+        !checkIn ||
+        !checkOut
+      ) {
+        return res.status(400).json({
+          message:
+            "Please fill all required booking details"
+        });
+      }
+
+      const nights = Math.max(
+        1,
+        Math.ceil(
+          (new Date(checkOut) -
+            new Date(checkIn)) /
+            (1000 * 60 * 60 * 24)
+        )
+      );
+
+      const totalPrice =
+        hotel.price *
+        requestedRooms *
+        nights;
+
+      hotel.rooms -= requestedRooms;
+
+      const booking = {
+        id: nextBookingId++,
+
+        hotelId: hotel.id,
+
+        hotelName: hotel.name,
+
+        hotelImage: hotel.image,
+
+        guestName,
+
+        email,
+
+        phone: phone || "",
+
+        checkIn,
+
+        checkOut,
+
+        guests: Number(guests) || 1,
+
+        rooms: requestedRooms,
+
+        nights,
+
+        pricePerNight:
+          hotel.price,
+
+        totalPrice,
+
+        status: "Confirmed",
+
+        bookedAt:
+          new Date().toISOString()
+      };
+
+      bookings.push(booking);
+
+      res.status(201).json({
+        message:
+          "Booking confirmed successfully",
+
+        booking
+      });
+    } catch (error) {
+      console.error(
+        "Booking error:",
+        error
+      );
+
+      res.status(500).json({
+        message: "Booking failed"
+      });
+    }
+  }
+);
 
 /* =========================================================
    GET BOOKINGS
 ========================================================= */
 
-app.get("/api/bookings", (req, res) => {
-  res.json(bookings);
-});
+app.get(
+  "/api/bookings",
+  (req, res) => {
+    res.json(bookings);
+  }
+);
 
 /* =========================================================
    GET SINGLE BOOKING
 ========================================================= */
 
-app.get("/api/bookings/:id", (req, res) => {
-  const id = Number(req.params.id);
+app.get(
+  "/api/bookings/:id",
+  (req, res) => {
+    const id = Number(req.params.id);
 
-  const booking = bookings.find(
-    (item) => item.id === id
-  );
+    const booking =
+      bookings.find(
+        (item) => item.id === id
+      );
 
-  if (!booking) {
-    return res.status(404).json({
-      message: "Booking not found"
-    });
+    if (!booking) {
+      return res.status(404).json({
+        message: "Booking not found"
+      });
+    }
+
+    res.json(booking);
   }
-
-  res.json(booking);
-});
+);
 
 /* =========================================================
    CANCEL BOOKING
 ========================================================= */
 
-app.delete("/api/bookings/:id", (req, res) => {
-  const id = Number(req.params.id);
+app.delete(
+  "/api/bookings/:id",
+  (req, res) => {
+    const id = Number(req.params.id);
 
-  const bookingIndex = bookings.findIndex(
-    (item) => item.id === id
-  );
+    const bookingIndex =
+      bookings.findIndex(
+        (item) => item.id === id
+      );
 
-  if (bookingIndex === -1) {
-    return res.status(404).json({
-      message: "Booking not found"
+    if (bookingIndex === -1) {
+      return res.status(404).json({
+        message: "Booking not found"
+      });
+    }
+
+    const booking =
+      bookings[bookingIndex];
+
+    const hotel = hotels.find(
+      (item) =>
+        item.id === booking.hotelId
+    );
+
+    if (hotel) {
+      hotel.rooms +=
+        booking.rooms;
+
+      if (
+        hotel.rooms >
+        hotel.totalRooms
+      ) {
+        hotel.rooms =
+          hotel.totalRooms;
+      }
+    }
+
+    booking.status =
+      "Cancelled";
+
+    res.json({
+      message:
+        "Booking cancelled successfully",
+
+      booking
     });
   }
+);
 
-  const booking = bookings[bookingIndex];
+/* =========================================================
+   404 API HANDLER
+========================================================= */
 
-  const hotel = hotels.find(
-    (item) => item.id === booking.hotelId
-  );
-
-  if (hotel) {
-    hotel.rooms += booking.rooms;
-
-    if (hotel.rooms > hotel.totalRooms) {
-      hotel.rooms = hotel.totalRooms;
-    }
+app.use(
+  (req, res) => {
+    res.status(404).json({
+      message:
+        "API endpoint not found"
+    });
   }
-
-  booking.status = "Cancelled";
-
-  res.json({
-    message: "Booking cancelled successfully",
-    booking
-  });
-});
+);
 
 /* =========================================================
    SERVER
 ========================================================= */
 
-app.listen(PORT, () => {
-  console.log("");
-  console.log("==============================================");
-  console.log("        STAYFINDER BACKEND READY");
-  console.log("==============================================");
-  console.log(`Server:   http://localhost:${PORT}`);
-  console.log(`Hotels:   http://localhost:${PORT}/api/hotels`);
-  console.log(`Bookings: http://localhost:${PORT}/api/bookings`);
-  console.log(`Uploads:  http://localhost:${PORT}/uploads`);
-  console.log("==============================================");
-  console.log("No PostgreSQL");
-  console.log("No SQL");
-  console.log("No database required");
-  console.log("==============================================");
-});
+app.listen(
+  PORT,
+  "0.0.0.0",
+  () => {
+    console.log("");
+    console.log(
+      "=============================================="
+    );
+    console.log(
+      "        STAYFINDER BACKEND READY"
+    );
+    console.log(
+      "=============================================="
+    );
+    console.log(
+      `Server running on port ${PORT}`
+    );
+    console.log(
+      "Hotels:   /api/hotels"
+    );
+    console.log(
+      "Bookings: /api/bookings"
+    );
+    console.log(
+      "Uploads:  /uploads"
+    );
+    console.log(
+      "=============================================="
+    );
+    console.log(
+      "No PostgreSQL"
+    );
+    console.log(
+      "No SQL"
+    );
+    console.log(
+      "No database required"
+    );
+    console.log(
+      "=============================================="
+    );
+  }
+);
