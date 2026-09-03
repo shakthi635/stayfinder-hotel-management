@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 
 const API = "https://stayfinder-hotel-management.onrender.com/api";
+
 /* =========================================================
    NAVBAR
 ========================================================= */
@@ -209,7 +210,11 @@ function HotelList() {
 
   const [loading, setLoading] = useState(true);
 
-  const loadHotels = async () => {
+  /* =======================================================
+     LOAD HOTELS WITH AUTOMATIC RETRY
+  ======================================================= */
+
+  const loadHotels = async (attempt = 1) => {
     try {
       setLoading(true);
 
@@ -217,17 +222,44 @@ function HotelList() {
         `${API}/hotels`
       );
 
+      if (!response.ok) {
+        throw new Error(
+          `Server returned ${response.status}`
+        );
+      }
+
       const data = await response.json();
 
       setHotels(data);
+      setLoading(false);
+
     } catch (error) {
-      console.error(error);
+      console.error(
+        `Backend connection attempt ${attempt} failed:`,
+        error
+      );
+
+      /*
+        Render free services can take a few seconds
+        to wake up after being idle.
+
+        Automatically retry the request instead of
+        immediately showing an error to the user.
+      */
+
+      if (attempt < 4) {
+        setTimeout(() => {
+          loadHotels(attempt + 1);
+        }, 3000);
+
+        return;
+      }
+
+      setLoading(false);
 
       alert(
-        "Cannot connect to backend. Make sure server.js is running."
+        "Unable to connect to the hotel service. Please try again."
       );
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -1938,7 +1970,11 @@ export default function App() {
             <div className="not-found">
               <div>
                 <span>404</span>
-                <h1>Page not found</h1>
+
+                <h1>
+                  Page not found
+                </h1>
+
                 <button
                   className="primary-button"
                   onClick={() =>
