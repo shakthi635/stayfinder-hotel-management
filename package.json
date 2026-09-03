@@ -4,9 +4,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "start": "node server/server.js",
     "dev": "vite",
     "server": "node server/server.js",
-    "start": "node server/server.js"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.12.0",
