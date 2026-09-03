@@ -6,8 +6,7 @@ import {
   useLocation
 } from "react-router-dom";
 
-const API = "http://localhost:5000/api";
-
+const API = "https://stayfinder-hotel-management.onrender.com/api";
 /* =========================================================
    NAVBAR
 ========================================================= */
